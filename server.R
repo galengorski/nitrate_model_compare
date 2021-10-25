@@ -14,11 +14,12 @@ function(input, output, session) {
     for(i in 1:length(unique(model_metrics_map$Site))){
       site_temp <- model_metrics_map[model_metrics_map$Site == unique(model_metrics_map$Site)[i],]
       if(grepl('RMSE',metric)|grepl('NSE',metric)){
-        best_models <- rbind(best_models, site_temp[site_temp[metric] == min(site_temp[metric]),c("Site","Model")])
+        best_models <- rbind(best_models, site_temp[site_temp[metric] == min(site_temp[metric]),c("Site","Model", metric)])
       }else{
-        best_models <- rbind(best_models, site_temp[site_temp[metric] == max(site_temp[metric]),c("Site","Model")])
+        best_models <- rbind(best_models, site_temp[site_temp[metric] == max(site_temp[metric]),c("Site","Model", metric)])
       }
     }
+    
     
     #####
     #read in the site locations
@@ -49,10 +50,10 @@ function(input, output, session) {
     leaflet(site_loc_df) %>% addProviderTiles(providers$Esri.WorldTopoMap) %>%
       addCircleMarkers(lng = ~LNG_GAGE, lat = ~LAT_GAGE,
                        fillColor = ~colors, stroke = T, fill = T, weight = 1, opacity = 1, fillOpacity = 1,
-                       radius = 6, color = 'black', label = ~STANAME) %>%
+                       radius = 6, color = 'black', label = paste(site_loc_df$STANAME, paste(input$peformance_metric_map, round(site_loc_df[,metric], 3),sep = '='), sep = ' | \n')) %>%
       leaflet::addLegend("topright", colors = c('#f94144','#f8961e','#772e25','#2b9348','#0096c7','cyan'), 
                          labels = c("local", "local_bfs","all_ws","all_ws_bfs","all_ws_attr","all_ws_bfs_attr"),
-                         title = "Best Performing Model Nitrate <br/> Mutual Information Validation",
+                         title = paste0("Best Performing Model Nitrate <br/>", input$peformance_metric_map),
                          opacity = 1) %>% 
       addCircleMarkers(lng = as.numeric(single_site_loc$LNG_GAGE), lat = as.numeric(single_site_loc$LAT_GAGE),
                         popup = single_site_loc$STANAME, radius = 12, color = 'black', stroke = T, fill = T, weight = 2, opacity = 1, fillOpacity = 0)
@@ -77,7 +78,8 @@ function(input, output, session) {
     }
     
     site_no <- site_loc[site_loc$STANAME == input$sitename,]$STAID
-    plot_site <- model_results[[site_no]][,c(3:9)]
+    #head(model_results[[site_no]])
+    plot_site <- model_results[[site_no]][,c(9:15)]
     
     datetime_plotting <- model_results[[site_no]]['DateTime']
     
@@ -128,5 +130,48 @@ function(input, output, session) {
     text(y = seq(0.75,7,1.2),x = min(metric_plot)*0.25,labels=as.character(round(metric_plot, digits = 2)))
 
   })
+  
+  #---------------------------------------------------------------#
+  #####Validation Time Series######
+  
+  output$pred_plot <- renderDygraph({
+    #read in site locations
+    site_loc <- read.csv('./output_data/site_locations.csv')
+    site_loc$STAID <- str_pad(site_loc$STAID, 8, pad = "0")
+    #read in model results
+    model_results <- list()
+    for(i in 1:length(site_loc$STAID)){
+      model_results[[site_loc$STAID[i]]] <- read_csv(paste('./output_data/', site_loc$STAID[i],'.csv', sep = ''), col_types = 'Dfnnnnnnn')
+    }
+    
+    site_no <- site_loc[site_loc$STANAME == input$sitename,]$STAID
+    plot_site <- model_results[[site_no]][,c(3:5,8)]
+    
+    plot_site <- plot_site %>%
+      mutate(precip = precip/10)
+    
+    #print(head(model_results[[site_no]]))
+    
+    datetime_plotting <- model_results[[site_no]]['DateTime']
+    
+    plot_site[,c(which(colnames(plot_site) %nin% input$pred_display))] <- NA
+    
+    don_obs <- xts(x = plot_site, order.by = datetime_plotting$DateTime)
+    
+    dygraph(don_obs, main = paste0('Features used for prediction at ',input$sitename), ylab = 'Discharge (cfs)') %>%
+      dySeries('discharge', strokeWidth = 3, color = 'black') %>%
+      dySeries('baseflow', strokeWidth = 2, color = 'red', strokePattern = 'dashed') %>%
+      dySeries('quickflow', strokeWidth = 2, color = 'forestgreen', strokePattern = 'dashed') %>%
+      dySeries('precip', strokeWidth = 2, color = 'blue', axis = 'y2') %>%
+      dyAxis("y2", label = "Precipitation (mm)", valueRange = c(max(plot_site$precip)*1.75, 0), axisLabelColor = 'blue') %>%
+      dyRangeSelector() %>%
+      dyLegend(labelsSeparateLines = TRUE, labelsDiv = 'div_pred_legend', show = 'always')
+  })
+  output$pred_legend <- renderUI({
+    htmlOutput("div_pred_legend", height = "400px")
+  })
+  
+  #####
+  #---------------------------------------------------------------#
 
 }
