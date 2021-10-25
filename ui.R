@@ -86,19 +86,19 @@ shinyUI(fluidPage(
         column(6,
                selectInput("peformance_metric", label = h4("Select Performance Metric"), selected = "RMSE_Valid", choices = c('RMSE_Valid','NRMSE_Valid_mean','NRMSE_Valid_iq', 'MI_Valid','RMSE_Calib', 'NRMSE_Calib_mean','NRMSE_Calib_iq','MI_Calib'))
                )
-      ),
-      fluidRow(
-        column(8,
-               dygraphOutput("pred_plot")),
-        column(2,
-               uiOutput('pred_legend')),
-        column(2,
-               checkboxGroupInput("pred_display", label = h4("Select predictors to display"), choices = c('discharge','baseflow','quickflow','precip'), selected = c('discharge', 'precip'))
-               )
+      )#,
+      #fluidRow(
+        #column(8,
+        #       dygraphOutput("pred_plot")),
+        #column(2,
+        #       uiOutput('pred_legend')),
+        #column(2,
+        #       checkboxGroupInput("pred_display", label = h4("Select predictors to display"), choices = c('discharge','baseflow','quickflow','precip'), selected = c('discharge', 'precip'))
+       #        )
       )
     )
   )
 )
-)
+#)
 
 
