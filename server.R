@@ -134,43 +134,43 @@ function(input, output, session) {
   #---------------------------------------------------------------#
   #####Validation Time Series######
   
-  output$pred_plot <- renderDygraph({
-    #read in site locations
-    site_loc <- read.csv('./output_data/site_locations.csv')
-    site_loc$STAID <- str_pad(site_loc$STAID, 8, pad = "0")
-    #read in model results
-    model_results <- list()
-    for(i in 1:length(site_loc$STAID)){
-      model_results[[site_loc$STAID[i]]] <- read_csv(paste('./output_data/', site_loc$STAID[i],'.csv', sep = ''), col_types = 'Dfnnnnnnn')
-    }
-    
-    site_no <- site_loc[site_loc$STANAME == input$sitename,]$STAID
-    plot_site <- model_results[[site_no]][,c(3:5,8)]
-    
-    plot_site <- plot_site %>%
-      mutate(precip = precip/10)
-    
-    #print(head(model_results[[site_no]]))
-    
-    datetime_plotting <- model_results[[site_no]]['DateTime']
-    
-    plot_site[,c(which(colnames(plot_site) %nin% input$pred_display))] <- NA
-    
-    don_obs <- xts(x = plot_site, order.by = datetime_plotting$DateTime)
-    
-    dygraph(don_obs, main = paste0('Features used for prediction at ',input$sitename), ylab = 'Discharge (cfs)') %>%
-      dySeries('discharge', strokeWidth = 3, color = 'black') %>%
-      dySeries('baseflow', strokeWidth = 2, color = 'red', strokePattern = 'dashed') %>%
-      dySeries('quickflow', strokeWidth = 2, color = 'forestgreen', strokePattern = 'dashed') %>%
-      dySeries('precip', strokeWidth = 2, color = 'blue', axis = 'y2') %>%
-      dyAxis("y2", label = "Precipitation (mm)", valueRange = c(max(plot_site$precip)*1.75, 0), axisLabelColor = 'blue') %>%
-      dyRangeSelector() %>%
-      dyLegend(labelsSeparateLines = TRUE, labelsDiv = 'div_pred_legend', show = 'always')
-  })
-  output$pred_legend <- renderUI({
-    htmlOutput("div_pred_legend", height = "400px")
-  })
-  
+  # output$pred_plot <- renderDygraph({
+  #   #read in site locations
+  #   site_loc <- read.csv('./output_data/site_locations.csv')
+  #   site_loc$STAID <- str_pad(site_loc$STAID, 8, pad = "0")
+  #   #read in model results
+  #   model_results <- list()
+  #   for(i in 1:length(site_loc$STAID)){
+  #     model_results[[site_loc$STAID[i]]] <- read_csv(paste('./output_data/', site_loc$STAID[i],'.csv', sep = ''), col_types = 'Dfnnnnnnn')
+  #   }
+  #   
+  #   site_no <- site_loc[site_loc$STANAME == input$sitename,]$STAID
+  #   plot_site <- model_results[[site_no]][,c(3:5,8)]
+  #   
+  #   plot_site <- plot_site %>%
+  #     mutate(precip = precip/10)
+  #   
+  #   #print(head(model_results[[site_no]]))
+  #   
+  #   datetime_plotting <- model_results[[site_no]]['DateTime']
+  #   
+  #   plot_site[,c(which(colnames(plot_site) %nin% input$pred_display))] <- NA
+  #   
+  #   don_obs <- xts(x = plot_site, order.by = datetime_plotting$DateTime)
+  #   
+  #   dygraph(don_obs, main = paste0('Features used for prediction at ',input$sitename), ylab = 'Discharge (cfs)') %>%
+  #     dySeries('discharge', strokeWidth = 3, color = 'black') %>%
+  #     dySeries('baseflow', strokeWidth = 2, color = 'red', strokePattern = 'dashed') %>%
+  #     dySeries('quickflow', strokeWidth = 2, color = 'forestgreen', strokePattern = 'dashed') %>%
+  #     dySeries('precip', strokeWidth = 2, color = 'blue', axis = 'y2') %>%
+  #     dyAxis("y2", label = "Precipitation (mm)", valueRange = c(max(plot_site$precip)*1.75, 0), axisLabelColor = 'blue') %>%
+  #     dyRangeSelector() %>%
+  #     dyLegend(labelsSeparateLines = TRUE, labelsDiv = 'div_pred_legend', show = 'always')
+  # })
+  # output$pred_legend <- renderUI({
+  #   htmlOutput("div_pred_legend", height = "400px")
+  # })
+  # 
   #####
   #---------------------------------------------------------------#
 
