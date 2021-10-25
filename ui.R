@@ -1,29 +1,31 @@
 #shiny ui for viewing modeling results
 #===================================================================================#
 #####INSTALL PACKAGES#####
-install.packages('shiny')
+#install.packages('shiny')
 library(shiny)
-install.packages('shinythemes')
+#install.packages('shinythemes')
 library(shinythemes)
-install.packages('shinyWidgets')
+#install.packages('shinyWidgets')
 library(shinyWidgets)
-install.packages('tidyverse')
+#install.packages('tidyverse')
 library(tidyverse)
-install.packages('dplyr')
+#install.packages('dplyr')
 library(dplyr)
-install.packages('leaflet')
+#install.packages('leaflet')
 library(leaflet)
-install.packages('foreign')
+#install.packages('foreign')
 library(foreign)
-install.packages('sp')
+#install.packages('sp')
 library(sp)
-install.packages('readr')
+#install.packages('rgdal')
+library(rgdal)
+#install.packages('readr')
 library(readr)
-install.packages('dygraphs')
+#install.packages('dygraphs')
 library(dygraphs)
-install.packages('xts')
+#install.packages('xts')
 library(xts)
-install.packages('Hmisc')
+#install.packages('Hmisc')
 library(Hmisc)
 #####
 #===================================================================================#
@@ -41,7 +43,7 @@ shinyUI(fluidPage(
     sidebarPanel(
       fluidRow(
       h4('Site Locations'),
-      leafletOutput('map'),
+      leafletOutput('map',width = "75%", height = "500px"),
       ),
       fluidRow(
         column(6,
