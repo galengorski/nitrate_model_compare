@@ -92,7 +92,7 @@ shinyUI(fluidPage(
                plotOutput('model_metrics_plot_2')
                )
       )),
-      tabPanel('Predictions',
+      tabPanel('Model Predictors',
       fluidRow(
         column(8,
                dygraphOutput("pred_plot")),
