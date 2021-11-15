@@ -25,6 +25,8 @@ library(dygraphs)
 library(xts)
 #install.packages('Hmisc')
 library(Hmisc)
+#install.packages('magrittr')
+library(magrittr)
 #####
 #===================================================================================#
 
