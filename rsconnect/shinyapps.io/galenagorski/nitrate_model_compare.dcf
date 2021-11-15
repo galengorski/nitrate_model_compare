@@ -5,7 +5,7 @@ account: galenagorski
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4951850
-bundleId: 5175015
+bundleId: 5254962
 url: https://galenagorski.shinyapps.io/nitrate_model_compare/
-when: 1635174596.24424
-lastSyncTime: 1635174596.24425
+when: 1637002557.25247
+lastSyncTime: 1637002557.25248
